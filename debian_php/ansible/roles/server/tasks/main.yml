@@ -1,4 +1,23 @@
 ---
+- name: Remove default repos
+  become: yes
+  apt_repository: repo={{item}} state=absent
+  with_items:
+    - "deb http://httpredir.debian.org/debian jessie main"
+    - "deb-src http://httpredir.debian.org/debian jessie main"
+
+
+- name: Add Unizar repos
+  become: yes
+  apt_repository: repo={{item}} state=present
+  with_items:
+    - "deb http://softlibre.unizar.es/debian jessie main contrib non-free"
+    - "deb-src http://softlibre.unizar.es/debian jessie main contrib non-free"
+    - "deb http://softlibre.unizar.es/debian jessie-updates main contrib non-free"
+    - "deb-src http://softlibre.unizar.es/debian jessie-updates main contrib non-free"
+    - "deb http://security.debian.org/ jessie/updates main contrib non-free"
+    - "deb-src http://security.debian.org/ jessie/updates main contrib non-free"    
+
 - name: Update apt
   become: yes
   apt: 
@@ -17,8 +36,8 @@
 - name: Install Extra Packages
   become: yes
   apt: pkg={{ item }} state=latest
-  with_items: '{{ server.packages }}'
-  when: '{{server.packages }}  is defined'
+  with_items: "{% if 'packages' in server %} {{server.packages | default({}) }} {% endif %} "
+  when: server.packages   is defined
 
 - name: Configure the timezone
   become: yes
@@ -28,7 +47,10 @@
   become: yes
   file: src=/usr/share/zoneinfo/{{server.timezone}} dest=/etc/localtime state=link force=yes backup=yes
 
-- name: Set default system language pack
-  shell: locale-gen {{server.locale}}
-  become: yes
+#- name: Set default system language pack
+#  shell: locale-gen {{server.locale}}
+#  become: yes
 
+- locale_gen:
+    name: "{{server.locale}}"
+    state: present

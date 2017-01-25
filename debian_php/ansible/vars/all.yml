@@ -5,11 +5,15 @@ server:
     locale: en_US.UTF-8
 vagrant_local:
     install: '1'
-    vm: { base_box: trusty64, hostname: debianyii, ip: 192.168.33.99, memory: '512', sharedfolder: ./, useVagrantCloud: '1', syncType: nfs }
+    vm: { base_box: trusty64, hostname: debianyii, ip: 192.168.33.99, memory: '1024', sharedfolder: ./, useVagrantCloud: '1', syncType: nfs }
 nginx:
     install: '1'
-    docroot: /var/www/html
+    docroot: /vagrant/sites
     servername: masteryii
+apache:
+    install: '1'
+    docroot: /vagrant/sites
+    servername: masteryii    
 mysql:
     install: '1'
     root_password: '123'
@@ -23,7 +27,7 @@ redis:
 php:
     install: '1'
     ppa: php5-5.6
-    packages: ['php5-cli', 'php5-intl', 'php5-mcrypt', 'php5-mysql']
+    packages: ['php5-cli', 'php5-intl', 'php5-mcrypt', 'php5-mysql', 'php5-curl', 'php5-gd','php5-xmlrpc']
 xdebug:
     install: '1'
 composer:

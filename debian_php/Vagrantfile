@@ -32,7 +32,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.customize [
             "modifyvm", :id,
             "--name", "debianyii",
-            "--memory", 512,
+            "--memory", 1024,
             "--natdnshostresolver1", "on",
             "--cpus", 1,
         ]
@@ -44,11 +44,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.ssh.forward_agent = true
 
     # Shared folder usinf nfs. Ensure box has client.
-    config.vm.provision "shell", inline: "apt-get install --yes nfs-common portmap"
-    config.vm.synced_folder ".", "/vagrant"  , 
-	  :nfs => true,
-	  :nfs_version => 4,
-	  :nfs_udp => false 
+#    config.vm.provision "shell", inline: "apt-get install --yes nfs-common portmap"
+#    config.vm.synced_folder ".", "/vagrant"  , 
+#	  :nfs => true,
+#	  :nfs_version => 4,
+#	  :nfs_udp => false 
+
+    config.vm.synced_folder ".", "/vagrant"  , id: "vagrant-root", 
+      type: "virtualbox",
+      owner: "vagrant",
+      group: "www-data",
+      mount_options: ["dmode=775,fmode=664"]
+
 
     # If ansible is in your path it will provision from your HOST machine
     # If ansible is not found in the path it will be instaled in the VM and provisioned from there

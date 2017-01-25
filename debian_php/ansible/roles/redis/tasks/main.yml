@@ -58,9 +58,6 @@
 
 - name: Update systemd
   command : update-rc.d redis_{{ redis.port }} defaults
-  
-- name: Set to start boot
-  service: name=redis_{{ redis.port }} enabled=yes
 
 - name: Create config file
   template: src=conf.tpl dest={{ redis_conf_path }}/{{ redis.port }}.conf

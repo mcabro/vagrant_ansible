@@ -1,8 +1,4 @@
 ---
-# Retrieve the current hostname, because {{ ansible_hostname }} still contains the old name
-- shell: hostname
-  register: current_hostname
-
 - name: mysql | Install MySQL Packages
   become: yes
   apt: pkg={{ item }} state=latest
@@ -14,13 +10,19 @@
 - name: mysql | Update root password for all root accounts
   mysql_user: name=root host={{ item }} check_implicit_admin=yes password={{ mysql.root_password }} login_user=root login_password={{ mysql.root_password }}
   with_items:
-    - "{{ current_hostname.stdout | lower }}"
+    - "{{ vagrant_local.vm.hostname | lower }}"
     - 127.0.0.1
     - ::1
     - localhost
 
 - name: mysql | Create databases
-  mysql_db: name={{ mysql.database }} state=present login_user=root login_password={{ mysql.root_password }}
+  mysql_db: 
+    name: "{{ mysql.database }}"
+    encoding: utf8
+    collation: utf8_unicode_ci
+    state: present 
+    login_user: root 
+    login_password: "{{ mysql.root_password }}"
 
 - name: mysql | Import dump
   mysql_db: name={{ mysql.database }} state=import login_user=root login_password={{ mysql.root_password }} target=/vagrant/{{ mysql.dump }}
@@ -30,7 +32,7 @@
   mysql_user: name='' host={{ item }} state=absent login_user=root login_password={{ mysql.root_password }}
   with_items:
     - localhost
-    - "{{ current_hostname.stdout | lower }}"
+    - "{{ vagrant_local.vm.hostname | lower }}"
 
 - name: mysql | Create users
   mysql_user: name={{ mysql.user }} password={{ mysql.password }} priv={{ mysql.database }}.*:ALL state=present login_user=root login_password={{ mysql.root_password }}
