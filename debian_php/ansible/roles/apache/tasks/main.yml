@@ -1,0 +1,33 @@
+---
+- name: Install Apache
+  become: yes
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - apache2
+    - libapache2-mod-fastcgi
+
+- name: Deinstall Apache Modules
+  apache2_module: state=absent name={{ item }} force=true # ignore_configcheck=True
+  notify: restart apache
+  with_items:
+    - php5
+    - prefork
+  
+
+- name: Install Apache Modules
+  apache2_module: state=present name={{ item }}
+  notify: restart apache
+  with_items:
+    - mpm_event
+    - fastcgi
+    - rewrite
+    - vhost_alias
+    - headers
+    - expires
+    - filter
+
+- name: Change default apache2.4 site
+  become: yes
+  template: src=vhost24.conf.tpl dest=/etc/apache2/sites-available/000-default.conf
+  notify: restart apache
+
