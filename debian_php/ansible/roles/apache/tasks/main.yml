@@ -13,18 +13,17 @@
     - php5
     
 - name: Disable Apache prefork.
-  shell: a2dismod mpm_prefork
-  notify: restart apache      
-
-- name: Enable Apache mpm_event.
-  shell: a2enmod mpm_event
-  notify: restart apache    
+  apache2_module:
+    state: absent
+    name: mpm_worker
+    ignore_configcheck: True
+  
   
 - name: Install Apache Modules
   apache2_module: state=present name={{ item }} 
   notify: restart apache
   with_items:
-    #- mpm_event
+    - mpm_event
     - fastcgi
     - actions
     - rewrite

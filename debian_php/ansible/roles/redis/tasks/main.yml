@@ -7,6 +7,7 @@
 - name: Get Redis installed version
   shell: "{{ redis_path }}/bin/redis-cli -v | awk {'print $2'}"
   when: installed_status.stdout == "yes"
+  changed_when: False
   register: installed_version
 
 - name: Set installed variable
@@ -58,6 +59,8 @@
 
 - name: Update systemd
   command : update-rc.d redis_{{ redis.port }} defaults
+  args:
+    creates: '/etc/rc2.d/S03redis_6379'
 
 - name: Create config file
   template: src=conf.tpl dest={{ redis_conf_path }}/{{ redis.port }}.conf
